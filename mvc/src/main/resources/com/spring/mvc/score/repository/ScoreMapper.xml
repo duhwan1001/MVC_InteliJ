@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace에 사용할 인터페이스 경로를 명시 -->
+<mapper namespace="com.spring.mvc.score.repository.ScoreMapper">
+
+    <!-- 점수 저장 기능 -->
+    <!-- id에는 추상메서드 이름 적기   -->
+    <insert id="save">
+        INSERT INTO score
+        (stu_name, kor, eng, math, total, average, grade)
+        VALUES
+        (#{name}, #{kor}, #{eng},
+        #{math}, #{total}, #{average}, #{grade})
+    </insert>
+
+    <!--  sql과 java의 이름관례 차이에서 나오는 문제를 보정  -->
+    <resultMap id="scoreMap" type="com.spring.mvc.score.controller.Score">
+        <!--  column: db에서 작성한이름 // property: java에서 작성한 이름      -->
+        <result column="stu_num" property="stuNum" />
+        <result column="stu_name" property="name" />
+    </resultMap>
+
+    <!-- 전체 점수 정보 조회   -->
+    <select id="findAll" resultMap="scoreMap">
+        SELECT
+        stu_num, stu_name,
+        kor, eng, math,
+        total, average, grade
+        FROM score
+        <if test="sort=='num'">
+            order by stu_num
+        </if>
+        <if test="sort=='name'">
+            order by stu_name
+        </if>
+        <if test="sort=='average'">
+            order by average desc
+        </if>
+    </select>
+
+    <!-- 개별 점수 조회-->
+    <select id="findOne" resultMap="scoreMap">
+        SELECT
+        stu_num, stu_name,
+        kor, eng, math,
+        total, average, grade
+        FROM score
+        WHERE stu_num = #{stuNum}
+    </select>
+
+    <!-- 점수 정보 삭제-->
+    <delete id="remove">
+        DELETE FROM score
+        WHERE stu_num = #{stuNum}
+    </delete>
+</mapper>
